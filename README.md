@@ -1,2 +1,1 @@
-# Docker-conf
-# Docker-conf
+Docker configuration files
