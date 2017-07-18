@@ -1,1 +1,49 @@
+version: '2'
+
+services:
+  elasticsearch:
+    container_name: elasticsearch
+    restart: always
+    build: elasticsearch/
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
+#      - ./elasticsearch/config:/usr/share/elasticsearch/config
+    environment:
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+    networks:
+      - docker_elk
+  logstash:
+    container_name: logstash
+    restart: always
+    build: logstash/
+    command: -f /etc/logstash/conf.d/
+    volumes:
+      - ./logstash/config:/etc/logstash/conf.d
+      - /etc/pki/tls/certs:/etc/pki/tls/certs
+      - /etc/pki/tls/private:/etc/pki/tls/private
+    ports:
+      - "5000:5000"
+    networks:
+      - docker_elk
+    depends_on:
+      - elasticsearch
+  kibana:
+    container_name: kibana
+    restart: always
+    build: kibana/
+    volumes:
+      - ./kibana/config/:/etc/kibana/
+    ports:
+      - "5601:5601"
+    networks:
+      - docker_elk
+    depends_on:
+      - elasticsearch
+
+networks:
+  docker_elk:
+    driver: bridge
 
